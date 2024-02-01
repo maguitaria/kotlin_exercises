@@ -1,6 +1,10 @@
 package com.example.helloworld
 
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -52,6 +57,10 @@ val purpleColor = Color(purple.toColorInt())
 @Composable
 fun LoginForm() {
     Surface {
+        var credentials by remember {
+            mutableStateOf(Credentials())
+        }
+        val context = LocalContext.current
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -66,13 +75,19 @@ fun LoginForm() {
         textAlign = TextAlign.Left,
         fontWeight = FontWeight.Bold,
             text = "Login")
-            LoginField(
-                value = "",
-                onChange = { },
-                modifier = Modifier.fillMaxWidth()
 
+            LoginField(
+                value = credentials.login,
+                onChange = { data-> credentials = credentials.copy(login = data)},
+                modifier = Modifier.fillMaxWidth()
             )
-            PasswordField(value = "Password", onChange = {}, submit = { /*TODO*/ },
+
+            PasswordField(
+                value = credentials.pwd,
+                onChange = {data -> credentials = credentials.copy(pwd = data)},
+                submit = {
+                         if (!checkCredentials(credentials, context)) credentials = Credentials()
+                },
                 modifier = Modifier.fillMaxWidth())
 
             // Align the button to the right
@@ -83,8 +98,10 @@ fun LoginForm() {
                 horizontalArrangement = Arrangement.End
             ) {
                 Button(
-                    onClick = {},
-                    enabled = true,
+                    onClick = {
+                              if (!checkCredentials(credentials,context)) credentials = Credentials()
+                    },
+                    enabled = credentials.isNotEmpty(),
                     modifier = Modifier.fillMaxWidth(),
 
                     ) {
@@ -105,6 +122,7 @@ fun LoginField(
     value: String,
     onChange: (String) -> Unit,
     modifier : Modifier = Modifier,
+    label : String = "Username"
 ) {
     val focusManager = LocalFocusManager.current
     val trailingIcon = @Composable {
@@ -118,14 +136,14 @@ fun LoginField(
     OutlinedTextField(
         value = (value),
         onValueChange = onChange,
-        //modifier = modifier.border(1.dp, MaterialTheme.colorScheme.primary),
+        modifier = modifier,
         trailingIcon = trailingIcon ,
         keyboardOptions =  KeyboardOptions(imeAction = ImeAction.Next),
         keyboardActions = KeyboardActions(
             onNext = {focusManager.moveFocus(FocusDirection.Down)}
         ),
 
-        label = {Text("")},
+        label = {Text(label)},
         singleLine = true,
         visualTransformation = VisualTransformation.None
     )
@@ -137,8 +155,7 @@ fun PasswordField(
     onChange: (String) -> Unit,
     submit : () -> Unit,
     modifier: Modifier = Modifier,
-    label : String = "Password",
-    placeholder : String = "Enter your password"
+    label : String = "Password"
 ) {
     var isPasswordVisible by remember {
         mutableStateOf(false)
@@ -173,14 +190,32 @@ fun PasswordField(
         keyboardActions = KeyboardActions(
             onDone = { submit() }
         ),
-        placeholder = { Text(placeholder) },
+
         label = { Text(label) },
         singleLine = true,
         visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation()
     )
 }
 
-@Composable
-fun LabeledCheckBox () {
+data class Credentials (
+    var login : String = "",
+    var pwd: String = "",
+    var remember: Boolean = false
+) {
+    fun isNotEmpty() : Boolean {
+        return login.isNotEmpty() && pwd.isNotEmpty()
+    }
 
+}
+
+fun checkCredentials(creds: Credentials, context : Context) : Boolean {
+
+    if (creds.isNotEmpty() && creds.login == "admin") {
+        context.startActivity(Intent(context, MainActivity::class.java))
+        (context as Activity).finish()
+    return true
+    } else {
+        Toast.makeText(context, "Wrong credentials", Toast.LENGTH_SHORT).show()
+        return false
+    }
 }
