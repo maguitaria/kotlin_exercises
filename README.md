@@ -20,7 +20,8 @@ This is a basic example of a login form created using Jetpack Compose for Androi
 3. Run the app on an emulator or a physical device.
 
 ## Overview
-!()[Screenshot_20240201_140909.png]
+![Screenshot_20240201_140909.png](Screenshot_20240201_140909.png)!()[Screenshot_20240201_140909.png]
+![Screenshot_20240201_141007.png](Screenshot_20240201_141007.png)
 The login form is implemented using Jetpack Compose, a modern Android UI toolkit that simplifies UI development.
 
 ### Components
