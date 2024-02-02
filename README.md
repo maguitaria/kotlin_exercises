@@ -1,3 +1,4 @@
-## 4. Weekly assignment (Walkthrough Theming)
+## 5. Weekly assignment (Calories count)
 
-![Screenshot_20240201_161117.png](Screenshot_20240201_161117.png)assignment4/Screenshot_20240201_161117.png
+During this walkthrough you will create an app that calculates calorie consumption
+based on weight, gender, and physical activity.
