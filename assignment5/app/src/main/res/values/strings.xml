@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">WalktrhoughCalories</string>
+    <string name="calories">ccal\n</string>
 </resources>
