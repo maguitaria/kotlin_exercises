@@ -64,35 +64,34 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
+@Preview
 @Composable
 fun CalorieScreen() {
-    // state variable
-    var weightInput by remember {
-        mutableStateOf("")
-    }
-    var weight by remember {
-        mutableStateOf(0)
-    }
-    var male by remember {
-        mutableStateOf(true)
-    }
-    var intensity by remember {
-        mutableStateOf(1.3f)
-    }
-    var result by remember {
-        mutableStateOf(0)
-    }
-    Column (
+    var weightInput by remember { mutableStateOf("") }
+    var weight by remember { mutableStateOf(0) }
+    var male by remember { mutableStateOf(true) }
+    var intensity by remember { mutableStateOf(1.3f) }
+    var result by remember { mutableStateOf(0) }
+
+    Column(
         modifier = Modifier.padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Heading(title = stringResource(R.string.calories))
-        WeightField(weightInput = weightInput, onValueChange = {weightInput = it} )
-        GenderChoices(male , setGenderMale = {male = it})
-        IntensityList(onClick = {intensity = it})
-        Text(text = result.toString(), color = MaterialTheme.colorScheme.secondary, fontWeight =  FontWeight.Bold )
-        Calculation(male = male, weight = weight , intensity = intensity, setResult = {result = it})
+        WeightField(weightInput = weightInput, onValueChange = { weightInput = it })
+        GenderChoices(male, setGenderMale = { male = it })
+        IntensityList(onClick = { intensity = it })
+        Text(
+            text = result.toString(),
+            color = MaterialTheme.colorScheme.secondary,
+            fontWeight = FontWeight.Bold
+        )
+        Calculation(
+            male = male,
+            weight = weight,
+            intensity = intensity,
+            setResult = { result = it }
+        )
     }
 }
 
@@ -115,7 +114,7 @@ fun WeightField(weightInput : String, onValueChange: (String) -> Unit) {
     OutlinedTextField(
         value = weightInput,
         onValueChange = onValueChange,
-        label = {  "Enter weight"},
+        label = { Text("Enter weight") },
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         modifier = Modifier.fillMaxWidth()
@@ -135,85 +134,63 @@ fun GenderChoices(male : Boolean, setGenderMale : (Boolean) -> Unit) {
         }
     }
 }
+
 @Composable
 fun IntensityList(onClick: (Float) -> Unit) {
-    var expanded by remember {
-        mutableStateOf(false)
-    }
-    var selectedText by remember {
-        mutableStateOf("Light")
-    }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedText by remember { mutableStateOf("Light") }
     var textFieldSize by remember { mutableStateOf(Zero) }
 
     val intensities = listOf("Light", "Usual", "Moderate", "Hard", "Very hard")
 
-    val icon  = if (expanded)
+    val icon = if (expanded)
         Icons.Filled.KeyboardArrowUp
     else
         Icons.Filled.KeyboardArrowDown
 
     Column {
-       OutlinedTextField(value = selectedText,
-        onValueChange = {selectedText = it},
-           modifier = Modifier
-               .fillMaxWidth()
-               .onGloballyPositioned { coordinates ->
-                   textFieldSize = coordinates.size.toSize()
-               },
-           label = { Text(text = "Select intensity")},
-           trailingIcon = {
-               Icon(icon, "contentDescription",
-                   Modifier.clickable { expanded = !expanded })
-           }
+        OutlinedTextField(
+            value = selectedText,
+            onValueChange = { selectedText = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .onGloballyPositioned { coordinates ->
+                    textFieldSize = coordinates.size.toSize()
+                },
+            label = { Text("Select intensity") },
+            trailingIcon = {
+                Icon(
+                    icon, "contentDescription",
+                    Modifier.clickable { expanded = !expanded }
+                )
+            }
         )
-           DropdownMenu(
+        DropdownMenu(
             expanded = expanded,
-               onDismissRequest = {expanded = false},
-               modifier = Modifier
-                   .width(with(LocalDensity.current){textFieldSize.width.toDp()})
-           ) {
-               intensities.forEach { label ->
-                   DropdownMenuItem(onClick = {
-                       selectedText = label
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
+        ) {
+            intensities.forEach { label ->
 
-
-                       var intensity: Float = when (label) {
-                           "Light" -> 1.3f
-                           "Usual" -> 1.5f
-                           "Moderate" -> 1.7f
-                           "Hard" -> 2f
-                           "Very hard" -> 2.2f
-                           else -> 0.0f
-                       }
-                       onClick(intensity)
-                       expanded = false
-                   }) {
-                       Text(text = label)
-                   }
-               }
-
-
-       }
-
+            }
+        }
     }
-
 }
 
 @Composable
-fun Calculation(male : Boolean, weight : Int,
-                intensity: Float, setResult:(Int) -> Unit) {
+fun Calculation(male: Boolean, weight: Int, intensity: Float, setResult: (Int) -> Unit) {
     Button(
         onClick = {
-            if (male) {
-                setResult(((879 + 10.2 * weight) * intensity).toInt())
-            } else {
-                setResult(((795 + 7.18 * weight) * intensity).toInt())
-            }
+            setResult(
+                if (male) ((879 + 10.2 * weight) * intensity).toInt()
+                else ((795 + 7.18 * weight) * intensity).toInt()
+            )
         },
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(text = "CALCULATE")
     }
 }
+
 
 
