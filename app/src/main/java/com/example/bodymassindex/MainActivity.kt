@@ -14,6 +14,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,30 +34,34 @@ import com.example.bodymassindex.ui.theme.BodyMassIndexTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         setContent {
             BodyMassIndexTheme {
-
-                val viewModel: BmiViewModel = viewModel()
-                ProvideBmiViewModel(viewModel = viewModel) {
-
-                    BmiCalculatorUI()
-                }
+                BmiCalculatorUI(viewModel = BmiViewModel())
             }
         }
     }
 }
-@Preview
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun BmiCalculatorUI() {
-
+fun ProvideBmiViewModel(content: @Composable () -> Unit) {
+    // Initialize the ViewModel within a @Composable function
     val viewModel: BmiViewModel = viewModel()
 
+    DisposableEffect(viewModel) {
+        onDispose {
+            // Clean up any resources if needed
+        }
+    }
+
+    content()
+}
+@Composable
+fun BmiCalculatorUI(viewModel: BmiViewModel) {
     var heightInput by remember { mutableStateOf("") }
     var weightInput by remember { mutableStateOf("") }
 
-    // Access the current keyboard controller
-    val keyboardController = LocalSoftwareKeyboardController.current
+
 
     Column(
         modifier = Modifier
@@ -65,15 +70,23 @@ fun BmiCalculatorUI() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "BMI calculator")
-
+        Text(
+            text = "Body Mass Index",
+            style = MaterialTheme.typography.displaySmall, // Use h5 for consistent styling
+            modifier = Modifier.padding(16.dp)
+        )
+        Text(
+            text = "Body mass index (BMI) is a measure of body fat based on height and weight that applies to adult men and women. ",
+            style = MaterialTheme.typography.bodyMedium, // Use h5 for consistent styling
+            modifier = Modifier.padding(16.dp)
+        )
         OutlinedTextField(
             value = heightInput,
             onValueChange = {
                 heightInput = it
-                viewModel.updateHeight(it.toFloatOrNull() ?: 0f)
+                viewModel.updateHeightCm(it.toFloatOrNull() ?: 0f)
             },
-            label = { Text("Enter Height (m)") },
+            label = { Text("Enter Height (cm)") },
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
@@ -102,28 +115,14 @@ fun BmiCalculatorUI() {
         // Display the BMI result
         Text(
             text = "BMI: ${viewModel.bmi.value ?: "-"}",
-            style = MaterialTheme.typography.displayMedium,
+            style = MaterialTheme.typography.displaySmall, // Use h5 for consistent styling
             modifier = Modifier.padding(16.dp)
         )
-    }
-}
-
-@Composable
-fun ProvideBmiViewModel(
-    viewModel: BmiViewModel,
-    content: @Composable (BmiViewModel) -> Unit
-) {
-
-    DisposableEffect(viewModel) {
-
-    }
-    content(viewModel)
-}
-
-@Composable
-fun <T> DisposableEffect(value: T, effect: (T) -> Unit) {
-    val currentOnDispose by rememberUpdatedState(effect)
-    DisposableEffect(value) {
-
+        // Display the BMI status
+        Text(
+            text = "Your BMI Category is: ${viewModel.calculateBmiStatus()}",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(16.dp)
+        )
     }
 }
