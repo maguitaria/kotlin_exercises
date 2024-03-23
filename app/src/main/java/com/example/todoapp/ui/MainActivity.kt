@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todoapp.ui.theme.TodoappTheme
+import com.example.todoapp.ui.viewmodel.Todo
 import com.example.todoapp.ui.viewmodel.TodoViewModel
 
 class MainActivity : ComponentActivity() {
@@ -41,10 +42,10 @@ fun TodoScreen(todoViewModel : TodoViewModel = viewModel()) {
 TodoList(todoViewModel.todos)
 }
 @Composable
-fun TodoList(todos: List<String>) {
+fun TodoList(todos: List<Todo>) {
     LazyColumn(modifier = Modifier.padding(8.dp)) {
         items(todos) { todo ->
-            Text(text = todo,
+            Text(text = todo.title,
                 modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
             )
             Divider(color = Color.LightGray, thickness = 1.dp)

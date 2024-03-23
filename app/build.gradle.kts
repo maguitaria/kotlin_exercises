@@ -83,7 +83,8 @@ dependencies {
 
     // Saved state module for ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version")
-
+    implementation ("com.squareup.retrofit2:retrofit:2.8.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.8.0")
 
     // alternately - if using Java8, use the following instead of lifecycle-compiler
     implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycle_version")
